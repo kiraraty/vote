@@ -1,7 +1,7 @@
-const {Sequelize,DataTypes,Model}=require('sequelize')
+﻿const {Sequelize,DataTypes,Model}=require('sequelize')
 const path=require('path')
 const dbFile = path.join(__dirname, 'db.sqlite3')
-const sequelize = new Sequelize({
+var sequelize = new Sequelize({
 	dialect: 'sqlite',
 	storage: dbFile,
 	logging: false,//关闭sql log

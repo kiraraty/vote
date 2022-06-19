@@ -1,11 +1,12 @@
-const { sequelize, User, Vote, Option } = require('./db')
+﻿const { sequelize, User, Vote, Option } = require('./db')
 const cors = require('cors')
-const cookieParser = require('cokie-parser')
+const cookieParser = require('cookie-parser')
 const express = require('express')
 
 const accountRouter = require('./account')
+const voteRouter = require('./vote')
 const app = express()
-const PORT =3005
+const PORT =3009
 app.use(cors({
 	origin: true,
 	maxAge:3600 * 24 * 60 * 60,
@@ -14,6 +15,7 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser('secret'))
 app.use('./account',accountRouter)
+app.use('/vote',voteRouter)
 app.use(async (req, res, next) =>{
 	if(req.signedCookies.user){
 		req.user= await User.findOne({
@@ -29,3 +31,4 @@ app.use(async (req, res, next) =>{
 app.listen(PORT,()=>{
 	
 })
+

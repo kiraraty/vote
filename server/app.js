@@ -2,7 +2,7 @@
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const express = require('express')
-
+const {io } =require('./servers')
 const accountRouter = require('./account')
 const voteRouter = require('./vote')
 const app = express()
@@ -28,6 +28,11 @@ app.use(async (req, res, next) =>{
 	}
 	next()
 })
+
+const {server}=require('./servers') //http server对象
+
+server.on('request',app)
+
 app.listen(PORT,()=>{
 	
 })

@@ -2,6 +2,13 @@ const { sequelize, User, Vote, Option } = require('./db')
 const express = require('express')
 const voteRouter = express.Router()
 module.exports = voteRouter
+
+
+io.on('connection',socket=>{  //socket.io连接对象
+	socket.on('select root',id=>{
+		socket.join('vote'+id)
+	})
+})
 // POST /vote/create
 /**
  * {title ,description,deadline,...  options:['','']}
@@ -45,6 +52,12 @@ voteRouter.post('/voteup/:optionId', async (req, res, next) => {
 	var option = await Option.findByPk(req.params.optionId)
 	option.addUser(req.user)
 	res.end()
+	//给房间的连接广播状态
+	io.to('vote'+option.VoteId).emit( 
+		'voting info',
+		//每个选项和及为其投票的观众
+		await Option.findAll({where:{VoteId:option.VoteId},include:[User]})
+	)
 })
 // DELETE /vote/5
 voteRouter.delete('/logout', async (req, res, next) => {

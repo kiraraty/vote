@@ -19,7 +19,7 @@ accountRouter.post('/register',async(req,res,next)=>{
 accountRouter.post('/login',async(req,res,next)=>{
 	try{
 		var user = await User.findOne({
-			attributes:['name','gender','avatar'],
+			attributes:['name','gender','avatar','id'],
 			where: {
 				name: req.body.name,
 				password: req.body.password
@@ -35,8 +35,15 @@ accountRouter.post('/login',async(req,res,next)=>{
  
 })
 accountRouter.get('/userinfo',async(req,res,next)=>{
-	if(req.user){
-		res.json(req.user.toJSON())
+	
+	if(req.user){//当前cookie对应的已经登录用户
+		var user = await User.findOne({
+			attributes: ['name', 'gender', 'avatar', 'id'],
+			where: {
+				name: req.body.name,
+			}
+		})
+		res.json(user.toJSON())
 	}else{
 		res.status(401).json({
 			code:-1,

@@ -6,7 +6,9 @@ function getVote(id) {
 export const voteFetcher={
 	read(id){
 		if(id in voteCache){
-				return voteCache[id]
+				var ret= voteCache[id]
+				delete voteCache[id]
+				return ret
 		}else{
 			throw getVote(id).then(v=>{
 				voteCache[id]=v

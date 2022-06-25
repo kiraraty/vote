@@ -1,15 +1,27 @@
-import React from 'react'
-
+import axios from 'axios'
+import React, { useRef } from 'react'
+import {useInput} from './hooks'
 export default function Register() {
-	function register(){
-
+	var name = useInput('')
+	var password = useInput('')
+	var gender = useInput('')
+	var email = useInput('')
+	async  function register() {
+	  await	axios.post('/account/register', {
+			name:name.value,
+			password:password.value,
+			gender:gender.value,
+			email:email.value
+		})
+		alert('ok')
 	}
 	return (
 		<div>
 			<form>
-				Username:<input />
-				Password:<input />
-				Gender:<input />
+				Username:<input {...name} />
+				Password:<input {...password} />
+				Gender:<input {...gender} />
+				Email:<input {...email} />
 				<button onClick={register}>注册</button>
 			</form>
 		</div>

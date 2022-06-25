@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
 import {useLocation} from "react-router-dom"
  export  function useInput(init){
 	var [value,setValue] =useState(init)
@@ -13,4 +14,18 @@ import {useLocation} from "react-router-dom"
 
 export function useQuery(){
 	return new URLSearchParams(useLocation().search)
+}
+
+export function useRequest(url){
+		var [data,setData]=useState(null)
+		var [loading,setLoading]=useState(true)
+
+		useEffect(()=>{
+			axios.get(url).then((res)=>{
+				setData(res.data)
+				setLoading(false)
+
+			})
+		},[url])
+		return [data,loading]
 }

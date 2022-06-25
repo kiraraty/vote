@@ -33,6 +33,9 @@ const {server}=require('./servers') //http server对象
 
 server.on('request',app)
 
+io.attach(server,{serveClient:false})
+
+
 app.listen(PORT,()=>{
 	
 })

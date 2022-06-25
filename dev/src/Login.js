@@ -21,11 +21,9 @@ export default function Login({ history }) {
 	}
 	return (
 		<div>
-			<form>
 				Username:<input />
 				Password:<input />
 				<button onClick={login}>登录</button>
-			</form>
 		</div>
 	)
 }

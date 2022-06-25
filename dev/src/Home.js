@@ -6,19 +6,7 @@ import axios from 'axios'
 export default function Home({ history}) {
 	var userCtx = useContext(UserContext)
 	//var history = useHistory()
-	useEffect(() => {
-		(async () => {
-			if (!userCtx.userInfo) {
-				try {
-					var info = (await axios.get('/account/userinfo')).data
-					userCtx.setUserInfo(info)
-				} catch (e) {
-					history.push("/login")
-				}
-			}
-		})()
-
-	}, [userCtx.userInfo])
+	
 	return (
 		<div>
 			<Link to='/create' >单选</Link>

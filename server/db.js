@@ -67,9 +67,11 @@ Option.init({
 	timestamps: false, // 关闭时间戳
 })
 
+//一对多关系
 Vote.hasMany(Option)
 Option.belongsTo(Vote)
 
+//多对多关系
 User.belongsToMany(Option, {
 	through: 'UserVoting',
 	timestamps: false,

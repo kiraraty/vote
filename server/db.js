@@ -1,15 +1,18 @@
-﻿const {Sequelize,DataTypes,Model}=require('sequelize')
-const path=require('path')
+﻿const { Sequelize, DataTypes, Model } = require('sequelize')
+const path = require('path')
+var __dirname = __dirname ?? '.'
+var exports = exports ?? {}
 const dbFile = path.join(__dirname, 'db.sqlite3')
-var sequelize = new Sequelize({
+const sequelize = new Sequelize({
 	dialect: 'sqlite',
 	storage: dbFile,
 	logging: false,//关闭sql log
 });
 
+exports.sequelize = sequelize
+
 class User extends Model { }
 exports.User = User
-exports.sequelize = sequelize
 
 User.init({
 	name: {
@@ -40,6 +43,7 @@ User.init({
 	sequelize, // We need to pass the connection instance
 	modelName: 'User' // We need to choose the model name
 })
+
 class Vote extends Model { }
 exports.Vote = Vote
 Vote.init({
@@ -53,6 +57,7 @@ Vote.init({
 	sequelize, // We need to pass the connection instance
 	modelName: 'Vote' // We need to choose the model name
 })
+
 User.hasMany(Vote)
 Vote.belongsTo(User)
 
@@ -67,11 +72,9 @@ Option.init({
 	timestamps: false, // 关闭时间戳
 })
 
-//一对多关系
 Vote.hasMany(Option)
 Option.belongsTo(Vote)
 
-//多对多关系
 User.belongsToMany(Option, {
 	through: 'UserVoting',
 	timestamps: false,
@@ -80,4 +83,5 @@ Option.belongsToMany(User, {
 	through: 'UserVoting',
 	timestamps: false,
 })
+
 sequelize.sync()

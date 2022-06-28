@@ -1,67 +1,111 @@
-
-import React,{ useEffect, useState,} from 'react'
-import { produce } from 'immer'
-import { useInput,useQuery } from './hooks'
-import { useHistory, useRouteMatch } from 'react-router-dom'
+import { useQuery } from './hooks'
 import axios from 'axios'
-export default function CreateVote() {
-	var [optionStrs,setOptions]=useState(['',''])
-	var title=useInput('')
-	var desc=useInput('')
-	var deadline=useInput(new Date(Date.now()+86400000).toISOString().slice(0,16))
-	var anonymous=useInput(false)
-	var restricted = useInput(false)
-	var match= useRouteMatch()
-	var query= useQuery()
-	var history=useHistory()
-	function addOption(){
-		setOptions([...optionStrs,''])
-	}
-	function deleteOption(idx){
-		setOptions(optionStrs.filter((it,index)=>index!==idx))
-	}
-	function setOptionStr(e,idx){
-	setOptions(produce(draft=>{
-			optionStrs[idx]=e.target.value
-		}))
-	}
-async	function createVote(){
-	try{
-		var vote = (await axios.post('/vote/create', {
-			title: title.value,
-			desc: desc.value,
-			deadline: deadline.value,
-			multiSelect: query.has('multiSelect'),
-			anonymous: anonymous.checked,
-			restricted: restricted.checked,
-			options: optionStrs
-		})).data
-		history.pushState('/vote/' + vote.id)
-	}catch (e) {
-		alert(e)
-	}
-	
+import { useHistory } from "react-router"
+import { Form, Input, Button, Checkbox, DatePicker } from 'antd';
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import moment from 'moment'
 
+
+
+export default function CreateVote() {
+	var query = useQuery()
+	var history = useHistory()
+
+	async function createVote(voteInfo) {
+		try {
+			var vote = (await axios.post('/vote/create', {
+				...voteInfo,
+				multiSelect: query.has('multiSelect'),
+			})).data
+
+			history.push('/vote/' + vote.id)
+		} catch (e) {
+			alert(e)
+		}
+	}
+
+	function onFinish(fd) {
+		console.log(fd)
 	}
 	return (
-		<div>
-			<form>
-				<div>Title:<input type="text" {...title}/></div>
-				<div>Desc:<input type="text"{...desc} /></div>
-				Options:
-				{
-					optionStrs.map((optionStr,idx)=>{
-						return <div key={idx}>
-							 <button onClick={()=>deleteOption(idx)}>-</button>
-							<input type="text" value={optionStr} onChange={e => setOptionStr(e,idx)}/> 
-							 </div>
-					})}
-				<div><button onClick={addOption}>Add Options</button></div>
-				<div>Deadline:<input type="datetime-local" {...deadline}/></div>
-				<div>Anonymous:<input type="checkbox" {...anonymous}/></div>
-				<div>Restricted:<input type="checkbox" {...restricted}/></div>
-				<button onClick={createVote}> Create</button>
-			</form>
-		</div>
-	)
+		<Form
+			name="basic"
+			initialValues={{ remember: true }}
+			onFinish={createVote}
+		>
+			<Form.Item
+				label="Title"
+				name="title"
+				rules={[{ required: true, message: '请输入投票标题' }]}
+			>
+				<Input />
+			</Form.Item>
+
+			<Form.Item
+				label="Description"
+				name="desc"
+				rules={[{ required: false, message: '请输入投票描述' }]}
+			>
+				<Input />
+			</Form.Item>
+
+			<Form.List
+				name="options"
+				initialValue={['', '']}
+			>
+				{(fields, { add, remove }, { errors }) => (
+					<>
+						{fields.map((field, index) => (
+							<Form.Item
+								label={index === 0 ? 'Options' : ''}
+								required={false}
+								key={field.key}
+							>
+								<Form.Item
+									{...field}
+									noStyle
+								>
+									<Input placeholder="option content" style={{ width: '60%' }} />
+								</Form.Item>
+								{' '}
+								{fields.length > 1 ? (
+									<MinusCircleOutlined
+										className="dynamic-delete-button"
+										onClick={() => remove(field.name)}
+									/>
+								) : null}
+							</Form.Item>
+						))}
+						<Form.Item>
+							<Button
+								type="dashed"
+								onClick={() => add()}
+								style={{ width: '60%' }}
+								icon={<PlusOutlined />}
+							>
+								Add Option
+							</Button>
+						</Form.Item>
+					</>
+				)}
+			</Form.List>
+
+			<Form.Item initialValue={moment().add(1, 'days')} label="DeadLine" name="deadline">
+				<DatePicker format="YYYY-MM-DD HH:mm" showTime={{ format: 'HH:mm' }} />
+			</Form.Item>
+			<Form.Item initialValue={false} name="anonymous" valuePropName="checked">
+				<Checkbox>Anonymous</Checkbox>
+			</Form.Item>
+			<Form.Item initialValue={false} name="restricted" valuePropName="checked">
+				<Checkbox>Restricted</Checkbox>
+			</Form.Item>
+
+			<Form.Item>
+				<Button type="primary" htmlType="submit">
+					Submit
+				</Button>
+			</Form.Item>
+		</Form>
+	);
+
 }

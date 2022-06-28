@@ -8,27 +8,23 @@ import ViewVote from './ViewVote'
 import My from './My'
 import UserContext from './UserContext'
 import axios from 'axios'
+
+import { useSelector,useDispatch } from 'react-redux'
 export default function App() {
-	const [userInfo, setUserInfo] = useState()
+
 	const history = useHistory()
+	const userInfo=useSelector(state=>state.user)
+	const dispatch = useDispatch()
+
 	async function logout() {
-		await axios.get('/account/logout')
-		history.push('/login')
+		dispatch({type: 'logout'})
 	}
+	//获取用户信息
 	useEffect(() => {
-		(async () => {
-			if (!userInfo) {
-				try {
-					var info = (await axios.get('/account/userinfo')).data
-					setUserInfo(info)
-				} catch (e) {
-					history.push("/login")
-				}
-			}
-		})()
-	}, [userCtx.userInfo])
+		dispatch({type:'get-user-info'})
+	}, [])
 	return (
-		<UserContext.Provider value={{ userInfo: userInfo, setUserInfo: setUserInfo }} >
+		<UserContext.Provider value={{ userInfo: userInfo }} >
 			<div className='App'>
 				{
 					userInfo
@@ -60,5 +56,6 @@ export default function App() {
 				</Switch>
 			</div>
 		</UserContext.Provider>
+	
 	)
 }
